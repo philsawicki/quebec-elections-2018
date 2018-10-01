@@ -3,6 +3,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const url = require('url');
 
 
 /**
@@ -21,7 +22,7 @@ const SERVER_PORT = process.env.PORT || 3001;
  * @access private
  */
 const _requestHandler = (request, response) => {
-    let filePath = '.' + request.url;
+    let filePath = '.' + url.parse(request.url).pathname;
     if (filePath === './') {
         filePath = './index.html';
     }

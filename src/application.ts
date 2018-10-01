@@ -191,24 +191,30 @@ export default class Application {
      */
     protected updateOverviewStats(results: Results) {
         const resultCards = document.querySelectorAll('.result-card');
-        const nbResults = Math.min(resultCards.length, results.statistiques.partisPolitiques.length);
+        const nbResults = Math.min(
+            resultCards.length,
+            results.statistiques.partisPolitiques.length
+        );
+
         for (let i = 0; i < nbResults; ++i) {
-            const resultCard = resultCards[i];
             const party = results.statistiques.partisPolitiques[i];
+            if (party.tauxCirconscriptionsEnAvance > 0) {
+                const resultCard = resultCards[i];
 
-            const partyName: HTMLDivElement = resultCard.querySelector('.party-name');
-            if (partyName !== null) {
-                partyName.innerText = this.sanitizePartyAbbreviation(party.abreviationPartiPolitique);
-            }
+                const partyName: HTMLDivElement = resultCard.querySelector('.party-name');
+                if (partyName !== null) {
+                    partyName.innerText = this.sanitizePartyAbbreviation(party.abreviationPartiPolitique);
+                }
 
-            const seatCounter: HTMLDivElement = resultCard.querySelector(`.count`);
-            if (seatCounter !== null) {
-                seatCounter.innerText = party.nbCirconscriptionsEnAvance.toString();
-            }
+                const seatCounter: HTMLDivElement = resultCard.querySelector('.count');
+                if (seatCounter !== null) {
+                    seatCounter.innerText = party.nbCirconscriptionsEnAvance.toString();
+                }
 
-            const voteProgressBar: HTMLDivElement = resultCard.querySelector(`.dashbg-${i + 1}`);
-            if (voteProgressBar !== null) {
-                voteProgressBar.style.width = `${party.tauxVoteTotal}%`;
+                const voteProgressBar: HTMLDivElement = resultCard.querySelector(`.dashbg-${i + 1}`);
+                if (voteProgressBar !== null) {
+                    voteProgressBar.style.width = `${party.tauxVoteTotal}%`;
+                }
             }
         }
     }
@@ -274,9 +280,12 @@ export default class Application {
             rejectedVoteRate.style.width = `${statistiques.nbVoteRejete * 100 / statistiques.nbVoteExerce}%`;
         }
 
-        const registeredVoters = document.getElementById('registered-voters');
-        if (registeredVoters !== null) {
-            registeredVoters.innerText = statistiques.nbElecteurInscrit.toLocaleString();
+        const participationRate = document.getElementById('participation-rate');
+        if (participationRate !== null) {
+            const participationRateLabel = typeof statistiques.tauxParticipationTotal === 'number'
+                ? `${statistiques.tauxParticipationTotal.toString()}%`
+                : '&mdash;';
+            participationRate.innerHTML = participationRateLabel;
         }
 
 
@@ -317,7 +326,7 @@ export default class Application {
                 .map(party => this.sanitizePartyAbbreviation(party.abreviationPartiPolitique)),
             'Others'
         ];
-        const labels = potentialLabels.length > 1 ? potentialLabels : ['N/A'];
+        const labels = potentialLabels.length > 1 ? potentialLabels : ['N./A.'];
 
         if (this.SeatsChart !== null) {
             this.SeatsChart.data.labels = labels;
@@ -353,7 +362,7 @@ export default class Application {
             ...filteredParties.map(party => this.sanitizePartyAbbreviation(party.abreviationPartiPolitique)),
             'Others'
         ];
-        const labels = potentialLabels.length > 1 ? potentialLabels : ['N/A'];
+        const labels = potentialLabels.length > 1 ? potentialLabels : ['N./A.'];
 
         if (this.VotesChart !== null) {
             this.VotesChart.data.labels = labels;
@@ -445,9 +454,9 @@ export default class Application {
         const ridingParticipationRate = document.getElementById('riding-participation-rate');
         if (ridingParticipationRate !== null) {
             const participationRate = typeof riding.tauxParticipation === 'number'
-                ? `${riding.tauxParticipation.toString()}%`
-                : '-';
-            ridingParticipationRate.innerText = participationRate;
+                ? `${riding.tauxParticipation.toFixed(2)}%`
+                : '&mdash;';
+            ridingParticipationRate.innerHTML = participationRate;
         }
     }
 
