@@ -39,6 +39,10 @@
         .stats-3-block .progress {
             margin: 10px auto;
         }
+        .stats-2-block .stats-2::after,
+        .stats-3-block .stats-3::after {
+            right: 0;
+        }
 
         #ridings-list {
             margin-bottom: 30px !important;
@@ -54,7 +58,7 @@
         }
         @media (min-width: 768px) {
             .stats-with-chart-2 .text {
-                left: 68%;
+                left: 64%;
             }
         }
         @media (min-width: 992px) {
@@ -113,7 +117,7 @@
       <div class="page-content">
         <div class="page-header">
           <div class="container-fluid">
-            <h2 class="h5 no-margin-bottom">Streaming results live throughout election night</h2>
+            <h2 class="h5 no-margin-bottom">Live-streaming results starting October 1st, 2018 at 8PM (EST)</h2>
           </div>
         </div>
 
@@ -259,8 +263,8 @@
                                 </div>
                             </div>
                             <div class="stats-3">
-                                <strong class="d-block" id="registered-voters">...</strong>
-                                <span class="d-block">Registered Voters</span>
+                                <strong class="d-block" id="participation-rate">...</strong>
+                                <span class="d-block">Participation rate</span>
                             </div>
                         </div>
 
@@ -299,6 +303,7 @@
                         <div class="block">
                             <div class="title">
                                 <strong>General Results</strong>
+                                <span class="d-block">Overall results per party</span>
                             </div>
                             <div class="table-responsive">
                                 <table class="table table-striped table-hover table-sm">
@@ -339,19 +344,19 @@
                                         <div class="stats-3 d-flex justify-content-between text-center" style="width: 100%">
                                             <div class="item">
                                                 <strong class="d-block strong-sm" id="riding-stations-complete">...</strong>
-                                                <span class="d-block span-sm">Stations Complete</span>
+                                                <span class="d-block span-sm">Stations complete</span>
                                             </div>
                                             <div class="item">
                                                 <strong class="d-block strong-sm" id="riding-stations-total">...</strong>
-                                                <span class="d-block span-sm">Total Stations</span>
+                                                <span class="d-block span-sm">Total stations</span>
                                             </div>
                                             <div class="item">
                                                 <strong class="d-block strong-sm" id="riding-registered-voters">...</strong>
-                                                <span class="d-block span-sm">Registered Voters</span>
+                                                <span class="d-block span-sm">Registered voters</span>
                                             </div>
                                             <div class="item">
                                                 <strong class="d-block strong-sm" id="riding-participation-rate">...</strong>
-                                                <span class="d-block span-sm">Participation Rate</span>
+                                                <span class="d-block span-sm">Participation rate</span>
                                             </div>
                                         </div>
                                     </div>
@@ -391,6 +396,6 @@
     </div>
 
     <script defer src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
-    <script defer src="./app.js"></script>
+    <script defer src="./app.js?_=1538360514514"></script>
   </body>
 </html>

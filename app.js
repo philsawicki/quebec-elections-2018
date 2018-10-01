@@ -128,19 +128,21 @@
             const resultCards = document.querySelectorAll('.result-card');
             const nbResults = Math.min(resultCards.length, results.statistiques.partisPolitiques.length);
             for (let i = 0; i < nbResults; ++i) {
-                const resultCard = resultCards[i];
                 const party = results.statistiques.partisPolitiques[i];
-                const partyName = resultCard.querySelector('.party-name');
-                if (partyName !== null) {
-                    partyName.innerText = this.sanitizePartyAbbreviation(party.abreviationPartiPolitique);
-                }
-                const seatCounter = resultCard.querySelector(`.count`);
-                if (seatCounter !== null) {
-                    seatCounter.innerText = party.nbCirconscriptionsEnAvance.toString();
-                }
-                const voteProgressBar = resultCard.querySelector(`.dashbg-${i + 1}`);
-                if (voteProgressBar !== null) {
-                    voteProgressBar.style.width = `${party.tauxVoteTotal}%`;
+                if (party.tauxCirconscriptionsEnAvance > 0) {
+                    const resultCard = resultCards[i];
+                    const partyName = resultCard.querySelector('.party-name');
+                    if (partyName !== null) {
+                        partyName.innerText = this.sanitizePartyAbbreviation(party.abreviationPartiPolitique);
+                    }
+                    const seatCounter = resultCard.querySelector('.count');
+                    if (seatCounter !== null) {
+                        seatCounter.innerText = party.nbCirconscriptionsEnAvance.toString();
+                    }
+                    const voteProgressBar = resultCard.querySelector(`.dashbg-${i + 1}`);
+                    if (voteProgressBar !== null) {
+                        voteProgressBar.style.width = `${party.tauxVoteTotal}%`;
+                    }
                 }
             }
         }
@@ -192,9 +194,12 @@
             if (rejectedVoteRate !== null) {
                 rejectedVoteRate.style.width = `${statistiques.nbVoteRejete * 100 / statistiques.nbVoteExerce}%`;
             }
-            const registeredVoters = document.getElementById('registered-voters');
-            if (registeredVoters !== null) {
-                registeredVoters.innerText = statistiques.nbElecteurInscrit.toLocaleString();
+            const participationRate = document.getElementById('participation-rate');
+            if (participationRate !== null) {
+                const participationRateLabel = typeof statistiques.tauxParticipationTotal === 'number'
+                    ? `${statistiques.tauxParticipationTotal.toString()}%`
+                    : '&mdash;';
+                participationRate.innerHTML = participationRateLabel;
             }
             const lastUpdatedDate = document.getElementById('last-update-date');
             const lastUpdateTime = document.getElementById('last-update-time');
@@ -223,7 +228,7 @@
                     .map(party => this.sanitizePartyAbbreviation(party.abreviationPartiPolitique)),
                 'Others'
             ];
-            const labels = potentialLabels.length > 1 ? potentialLabels : ['N/A'];
+            const labels = potentialLabels.length > 1 ? potentialLabels : ['N./A.'];
             if (this.SeatsChart !== null) {
                 this.SeatsChart.data.labels = labels;
                 this.SeatsChart.data.datasets[0].data = seats;
@@ -248,7 +253,7 @@
                 ...filteredParties.map(party => this.sanitizePartyAbbreviation(party.abreviationPartiPolitique)),
                 'Others'
             ];
-            const labels = potentialLabels.length > 1 ? potentialLabels : ['N/A'];
+            const labels = potentialLabels.length > 1 ? potentialLabels : ['N./A.'];
             if (this.VotesChart !== null) {
                 this.VotesChart.data.labels = labels;
                 this.VotesChart.data.datasets[0].data = votes;
@@ -320,9 +325,9 @@
             const ridingParticipationRate = document.getElementById('riding-participation-rate');
             if (ridingParticipationRate !== null) {
                 const participationRate = typeof riding.tauxParticipation === 'number'
-                    ? `${riding.tauxParticipation.toString()}%`
-                    : '-';
-                ridingParticipationRate.innerText = participationRate;
+                    ? `${riding.tauxParticipation.toFixed(2)}%`
+                    : '&mdash;';
+                ridingParticipationRate.innerHTML = participationRate;
             }
         }
         sanitizePartyAbbreviation(abbreviation) {
@@ -345,10 +350,8 @@
             }
         }
     }
-    //# sourceMappingURL=application.js.map
 
     const application = new Application();
-    //# sourceMappingURL=main.js.map
 
 }());
 //# sourceMappingURL=app.js.map
