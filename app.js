@@ -3,12 +3,13 @@
 
     const POLL_CLOSE_TIME = Date.parse('2018-10-01T20:00:00.000-04:00');
     const REFRESH_INTERVAL = 5 * 1000;
+    //# sourceMappingURL=settings.js.map
 
     class Application {
         constructor() {
             this.VotesChart = null;
             this.SeatsChart = null;
-            this.SelectedRidingIndex = -1;
+            this.SelectedRidingID = -1;
             this.Ridings = [];
             this.onResultsLoaded = this.onResultsLoaded.bind(this);
             this.installListeners();
@@ -55,9 +56,10 @@
         installListeners() {
             const ridingsDropDownElement = document.getElementById('ridings-list');
             if (ridingsDropDownElement !== null) {
-                ridingsDropDownElement.addEventListener('change', () => {
-                    this.SelectedRidingIndex = ridingsDropDownElement.selectedIndex;
-                    this.updateRiding(this.Ridings[this.SelectedRidingIndex]);
+                ridingsDropDownElement.addEventListener('change', e => {
+                    this.SelectedRidingID = parseInt(ridingsDropDownElement.options[ridingsDropDownElement.selectedIndex].value, 10);
+                    const selectedRiding = this.Ridings.filter(riding => riding.numeroCirconscription === this.SelectedRidingID);
+                    this.updateRiding(selectedRiding[0]);
                 });
             }
         }
@@ -268,20 +270,22 @@
             const ridingsDropDownElement = document.getElementById('ridings-list');
             if (ridingsDropDownElement !== null) {
                 ridingsDropDownElement.innerHTML = results.circonscriptions
-                    .map((riding, i) => {
-                    const isSelected = this.SelectedRidingIndex === i
+                    .map(riding => {
+                    const isSelected = this.SelectedRidingID === riding.numeroCirconscription
                         ? 'selected="selected"'
                         : '';
                     return `
-                        <option ${isSelected} value="${i}">
+                        <option ${isSelected} value="${riding.numeroCirconscription}">
                             ${riding.nomCirconscription}
                         </option>
                     `;
                 })
                     .join('');
             }
-            if (this.SelectedRidingIndex !== -1) {
-                this.updateRiding(results.circonscriptions[this.SelectedRidingIndex]);
+            if (this.SelectedRidingID !== -1) {
+                const selectedRiding = results.circonscriptions
+                    .filter(riding => riding.numeroCirconscription === this.SelectedRidingID);
+                this.updateRiding(selectedRiding[0]);
             }
             else if (results.circonscriptions.length > 0) {
                 this.updateRiding(results.circonscriptions[0]);
@@ -352,6 +356,7 @@
     }
 
     const application = new Application();
+    //# sourceMappingURL=main.js.map
 
 }());
 //# sourceMappingURL=app.js.map
