@@ -14,9 +14,9 @@ export default class Application {
      */
     protected SeatsChart: Chart = null;
     /**
-     * Index of the Riding currently being displayed.
+     * ID of the Riding currently being displayed.
      */
-    protected SelectedRidingIndex: number = -1;
+    protected SelectedRidingID: number = -1;
     /**
      * List of Riding data.
      */
@@ -96,9 +96,10 @@ export default class Application {
     protected installListeners() {
         const ridingsDropDownElement = document.getElementById('ridings-list') as HTMLSelectElement;
         if (ridingsDropDownElement !== null) {
-            ridingsDropDownElement.addEventListener('change', () => {
-                this.SelectedRidingIndex = ridingsDropDownElement.selectedIndex
-                this.updateRiding(this.Ridings[this.SelectedRidingIndex]);
+            ridingsDropDownElement.addEventListener('change', e => {
+                this.SelectedRidingID = parseInt(ridingsDropDownElement.options[ridingsDropDownElement.selectedIndex].value, 10);
+                const selectedRiding = this.Ridings.filter(riding => riding.numeroCirconscription === this.SelectedRidingID);
+                this.updateRiding(selectedRiding[0]);
             });
         }
     }
@@ -386,12 +387,12 @@ export default class Application {
         const ridingsDropDownElement = document.getElementById('ridings-list');
         if (ridingsDropDownElement !== null) {
             ridingsDropDownElement.innerHTML = results.circonscriptions
-                .map((riding, i) => {
-                    const isSelected = this.SelectedRidingIndex === i
+                .map(riding => {
+                    const isSelected = this.SelectedRidingID === riding.numeroCirconscription
                         ? 'selected="selected"'
                         : '';
                     return `
-                        <option ${isSelected} value="${i}">
+                        <option ${isSelected} value="${riding.numeroCirconscription}">
                             ${riding.nomCirconscription}
                         </option>
                     `;
@@ -400,8 +401,10 @@ export default class Application {
         }
 
         // Update the riding currently displayed:
-        if (this.SelectedRidingIndex !== -1) {
-            this.updateRiding(results.circonscriptions[this.SelectedRidingIndex]);
+        if (this.SelectedRidingID !== -1) {
+            const selectedRiding = results.circonscriptions
+                .filter(riding => riding.numeroCirconscription === this.SelectedRidingID);
+            this.updateRiding(selectedRiding[0]);
         } else if (results.circonscriptions.length > 0) {
             this.updateRiding(results.circonscriptions[0]);
         }
