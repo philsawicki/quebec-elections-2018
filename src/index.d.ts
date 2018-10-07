@@ -7,6 +7,7 @@ declare interface ChartDataset {
     data: number[];
     lineTension: number;
     backgroundColor: string[];
+    hoverBackgroundColor: string[];
     borderColor: string;
     borderWidth: number;
     pointBackgroundColor: string;
@@ -121,7 +122,7 @@ declare interface Circonscription {
     /**
      * Indicates the turnout in the electoral division.
      */
-    tauxParticipation: number | 'n.d.';
+    tauxParticipation: string | 'n.d.';
     /**
      * Indicates the percentage of rejected votes in the electoral division.
      */
@@ -257,6 +258,6 @@ declare interface Results {
          * Indicates the expected turnout at the end of the election if the
          * current trend holds.
          */
-        tauxParticipationTotal: number;
+        tauxParticipationTotal: string;
     };
 }

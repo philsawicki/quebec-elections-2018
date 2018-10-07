@@ -1,4 +1,5 @@
-import { POLL_CLOSE_TIME, REFRESH_INTERVAL } from './settings';
+import { generateColorGradient } from './color-utilities';
+import { POLL_CLOSE_TIME, REFRESH_INTERVAL, TOTAL_NB_SEATS } from './settings';
 
 
 /**
@@ -41,15 +42,17 @@ export default class Application {
     protected setupCharts() {
         const initialData: number[] = [];
 
-        const createChartConfig = (colors: string[]) => {
+        const createChartConfig = (gradientFrom: string, gradientTo: string) => {
+            const colorPalette = generateColorGradient(gradientFrom, gradientTo, 2);
+
             return {
                 type: 'doughnut',
                 data: {
                     datasets: [{
                         data: initialData,
                         borderWidth: [0, 0, 0, 0, 0, 0],
-                        backgroundColor: colors,
-                        hoverBackgroundColor: colors
+                        backgroundColor: colorPalette,
+                        hoverBackgroundColor: colorPalette
                     }]
                 },
                 options: {
@@ -65,20 +68,22 @@ export default class Application {
         };
 
         // Create "Seats" Chart:
+        // Gradient palette: ['#da4d60', '#e96577', '#f28695', '#ffb6c1', '#e5e5e5']
         const seatsCanvas = document.getElementById('seats') as HTMLCanvasElement;
         if (seatsCanvas !== null) {
             this.SeatsChart = new Chart(
                 seatsCanvas,
-                createChartConfig(['#da4d60', '#e96577', '#f28695', '#ffb6c1', '#e5e5e5'])
+                createChartConfig('#da4d60', '#e5e5e5')
             );
         }
 
         // Create "Votes" Chart:
+        // Gradient palette: ['#6933b9', '#8553d1', '#a372ec', '#be9df1', '#e5e5e5']
         const votesCanvas = document.getElementById('votes') as HTMLCanvasElement;
         if (votesCanvas !== null) {
             this.VotesChart = new Chart(
                 votesCanvas,
-                createChartConfig(['#6933b9', '#8553d1', '#a372ec', '#be9df1', '#e5e5e5'])
+                createChartConfig('#6933b9', '#e5e5e5')
             );
         }
     }
@@ -283,9 +288,10 @@ export default class Application {
 
         const participationRate = document.getElementById('participation-rate');
         if (participationRate !== null) {
-            const participationRateLabel = typeof statistiques.tauxParticipationTotal === 'number'
-                ? `${statistiques.tauxParticipationTotal.toString()}%`
-                : '&mdash;';
+            const participationRateValue = parseFloat(statistiques.tauxParticipationTotal);
+            const participationRateLabel = isNaN(participationRateValue)
+                ? '&mdash;'
+                : `${participationRateValue}%`;
             participationRate.innerHTML = participationRateLabel;
         }
 
@@ -310,7 +316,6 @@ export default class Application {
     protected drawSeatsChart(results: Results) {
         const { statistiques } = results;
 
-        const TOTAL_NB_SEATS = 125;
         const currentNBSeats = statistiques.partisPolitiques
             .reduce((accumulator, currentParty) => {
                 return accumulator + currentParty.nbCirconscriptionsEnAvance;
@@ -330,8 +335,17 @@ export default class Application {
         const labels = potentialLabels.length > 1 ? potentialLabels : ['N./A.'];
 
         if (this.SeatsChart !== null) {
+            const colors = this.SeatsChart.data.datasets[0].backgroundColor;
+            const colorPalette = generateColorGradient(
+                colors[0], // Gradient start color
+                colors[colors.length - 1], // Gradient end color
+                labels.length // Number of gradient steps to generate
+            );
+
             this.SeatsChart.data.labels = labels;
             this.SeatsChart.data.datasets[0].data = seats;
+            this.SeatsChart.data.datasets[0].backgroundColor = colorPalette;
+            this.SeatsChart.data.datasets[0].hoverBackgroundColor = colorPalette;
             this.SeatsChart.update();
         }
 
@@ -366,8 +380,17 @@ export default class Application {
         const labels = potentialLabels.length > 1 ? potentialLabels : ['N./A.'];
 
         if (this.VotesChart !== null) {
+            const colors = this.VotesChart.data.datasets[0].backgroundColor;
+            const colorPalette = generateColorGradient(
+                colors[0], // Gradient start color
+                colors[colors.length - 1], // Gradient end color
+                labels.length // Number of gradient steps to generate
+            );
+
             this.VotesChart.data.labels = labels;
             this.VotesChart.data.datasets[0].data = votes;
+            this.VotesChart.data.datasets[0].backgroundColor = colorPalette;
+            this.VotesChart.data.datasets[0].hoverBackgroundColor = colorPalette;
             this.VotesChart.update();
         }
 
@@ -456,10 +479,11 @@ export default class Application {
 
         const ridingParticipationRate = document.getElementById('riding-participation-rate');
         if (ridingParticipationRate !== null) {
-            const participationRate = typeof riding.tauxParticipation === 'number'
-                ? `${riding.tauxParticipation.toFixed(2)}%`
-                : '&mdash;';
-            ridingParticipationRate.innerHTML = participationRate;
+            const participationRateValue = parseFloat(riding.tauxParticipation);
+            const participationRateLabel = isNaN(participationRateValue)
+                ? '&mdash;'
+                : `${participationRateValue.toFixed(2)}%`;
+            ridingParticipationRate.innerHTML = participationRateLabel;
         }
     }
 
