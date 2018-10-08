@@ -1,7 +1,39 @@
 (function () {
     'use strict';
 
+    function generateColorGradient(from, to, nbSteps) {
+        const parsedFrom = from.replace('#', '');
+        const splitFrom = [
+            parseInt(parsedFrom.substr(0, 2), 16),
+            parseInt(parsedFrom.substr(2, 2), 16),
+            parseInt(parsedFrom.substr(4, 2), 16)
+        ];
+        const parsedTo = to.replace('#', '');
+        const splitTo = [
+            parseInt(parsedTo.substr(0, 2), 16),
+            parseInt(parsedTo.substr(2, 2), 16),
+            parseInt(parsedTo.substr(4, 2), 16)
+        ];
+        const colorRanges = [
+            splitTo[0] - splitFrom[0],
+            splitTo[1] - splitFrom[1],
+            splitTo[2] - splitFrom[2]
+        ];
+        const gradientColors = [];
+        for (let i = 0; i <= nbSteps; ++i) {
+            const colorStep = [
+                Math.floor(splitFrom[0] + colorRanges[0] * i / nbSteps).toString(16),
+                Math.floor(splitFrom[1] + colorRanges[1] * i / nbSteps).toString(16),
+                Math.floor(splitFrom[2] + colorRanges[2] * i / nbSteps).toString(16)
+            ];
+            gradientColors.push(`#${colorStep.join('')}`);
+        }
+        return gradientColors;
+    }
+    //# sourceMappingURL=color-utilities.js.map
+
     const POLL_CLOSE_TIME = Date.parse('2018-10-01T20:00:00.000-04:00');
+    const TOTAL_NB_SEATS = 125;
     const REFRESH_INTERVAL = 5 * 1000;
     //# sourceMappingURL=settings.js.map
 
@@ -19,15 +51,16 @@
         }
         setupCharts() {
             const initialData = [];
-            const createChartConfig = (colors) => {
+            const createChartConfig = (gradientFrom, gradientTo) => {
+                const colorPalette = generateColorGradient(gradientFrom, gradientTo, 2);
                 return {
                     type: 'doughnut',
                     data: {
                         datasets: [{
                                 data: initialData,
                                 borderWidth: [0, 0, 0, 0, 0, 0],
-                                backgroundColor: colors,
-                                hoverBackgroundColor: colors
+                                backgroundColor: colorPalette,
+                                hoverBackgroundColor: colorPalette
                             }]
                     },
                     options: {
@@ -43,11 +76,11 @@
             };
             const seatsCanvas = document.getElementById('seats');
             if (seatsCanvas !== null) {
-                this.SeatsChart = new Chart(seatsCanvas, createChartConfig(['#da4d60', '#e96577', '#f28695', '#ffb6c1', '#e5e5e5']));
+                this.SeatsChart = new Chart(seatsCanvas, createChartConfig('#da4d60', '#e5e5e5'));
             }
             const votesCanvas = document.getElementById('votes');
             if (votesCanvas !== null) {
-                this.VotesChart = new Chart(votesCanvas, createChartConfig(['#6933b9', '#8553d1', '#a372ec', '#be9df1', '#e5e5e5']));
+                this.VotesChart = new Chart(votesCanvas, createChartConfig('#6933b9', '#e5e5e5'));
             }
         }
         installJONPCallback() {
@@ -198,9 +231,10 @@
             }
             const participationRate = document.getElementById('participation-rate');
             if (participationRate !== null) {
-                const participationRateLabel = typeof statistiques.tauxParticipationTotal === 'number'
-                    ? `${statistiques.tauxParticipationTotal.toString()}%`
-                    : '&mdash;';
+                const participationRateValue = parseFloat(statistiques.tauxParticipationTotal);
+                const participationRateLabel = isNaN(participationRateValue)
+                    ? '&mdash;'
+                    : `${participationRateValue}%`;
                 participationRate.innerHTML = participationRateLabel;
             }
             const lastUpdatedDate = document.getElementById('last-update-date');
@@ -213,7 +247,6 @@
         }
         drawSeatsChart(results) {
             const { statistiques } = results;
-            const TOTAL_NB_SEATS = 125;
             const currentNBSeats = statistiques.partisPolitiques
                 .reduce((accumulator, currentParty) => {
                 return accumulator + currentParty.nbCirconscriptionsEnAvance;
@@ -232,8 +265,12 @@
             ];
             const labels = potentialLabels.length > 1 ? potentialLabels : ['N./A.'];
             if (this.SeatsChart !== null) {
+                const colors = this.SeatsChart.data.datasets[0].backgroundColor;
+                const colorPalette = generateColorGradient(colors[0], colors[colors.length - 1], labels.length);
                 this.SeatsChart.data.labels = labels;
                 this.SeatsChart.data.datasets[0].data = seats;
+                this.SeatsChart.data.datasets[0].backgroundColor = colorPalette;
+                this.SeatsChart.data.datasets[0].hoverBackgroundColor = colorPalette;
                 this.SeatsChart.update();
             }
             const leadingPartyLabel = document.getElementById('leading-party-by-seats');
@@ -257,8 +294,12 @@
             ];
             const labels = potentialLabels.length > 1 ? potentialLabels : ['N./A.'];
             if (this.VotesChart !== null) {
+                const colors = this.VotesChart.data.datasets[0].backgroundColor;
+                const colorPalette = generateColorGradient(colors[0], colors[colors.length - 1], labels.length);
                 this.VotesChart.data.labels = labels;
                 this.VotesChart.data.datasets[0].data = votes;
+                this.VotesChart.data.datasets[0].backgroundColor = colorPalette;
+                this.VotesChart.data.datasets[0].hoverBackgroundColor = colorPalette;
                 this.VotesChart.update();
             }
             const leadingPartyLabel = document.getElementById('leading-party-by-votes');
@@ -328,10 +369,11 @@
             }
             const ridingParticipationRate = document.getElementById('riding-participation-rate');
             if (ridingParticipationRate !== null) {
-                const participationRate = typeof riding.tauxParticipation === 'number'
-                    ? `${riding.tauxParticipation.toFixed(2)}%`
-                    : '&mdash;';
-                ridingParticipationRate.innerHTML = participationRate;
+                const participationRateValue = parseFloat(riding.tauxParticipation);
+                const participationRateLabel = isNaN(participationRateValue)
+                    ? '&mdash;'
+                    : `${participationRateValue.toFixed(2)}%`;
+                ridingParticipationRate.innerHTML = participationRateLabel;
             }
         }
         sanitizePartyAbbreviation(abbreviation) {
