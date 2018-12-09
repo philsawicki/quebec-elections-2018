@@ -122,7 +122,7 @@ export default class Application {
         const JSONP_ELEMENT_ID = 'jsonp-data';
         const NOW = Date.now();
         const url = NOW > POLL_CLOSE_TIME
-            ? `https://dgeq.org/resultats.js?_=${NOW}`
+            ? `https://dgeq.org/doc/gen1-10-2018/resultats.js?_=${NOW}`
             : `https://dgeq.org/doc/gen7-4-2014/resultats.js?_=${NOW}`;
 
         return new Promise((resolve, reject) => {
