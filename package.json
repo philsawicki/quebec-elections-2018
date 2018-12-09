@@ -6,19 +6,26 @@
   "scripts": {
     "compile": "rollup --config",
     "compile:watch": "npm run compile -- --watch",
+    "predeploy": "npm run lint && npm run compile",
+    "deploy": "gh-pages --dist ./dist --message \"Update live website\"",
     "lint": "tslint --project tsconfig.json",
     "serve": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["quebec", "election", "dashboard"],
+  "keywords": [
+    "quebec",
+    "election",
+    "dashboard"
+  ],
   "author": "Philippe Sawicki (https://philippesawicki.com)",
   "license": "ISC",
   "dependencies": {
-    "rollup": "^0.66.2",
+    "rollup": "^0.67.4",
     "rollup-plugin-typescript": "^1.0.0",
-    "typescript": "^3.1.1"
+    "typescript": "^3.2.2"
   },
   "devDependencies": {
+    "gh-pages": "^2.0.1",
     "tslint": "^5.11.0"
   }
 }

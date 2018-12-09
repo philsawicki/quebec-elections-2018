@@ -72,9 +72,6 @@
         // Disallows eval function invocations:
         "no-eval": true,
 
-        // Promises returned by functions must be handled appropriately:
-        "no-floating-promises": true,
-
         // Warns on use of ${ in non-template strings:
         "no-invalid-template-strings": true,
 
