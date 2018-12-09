@@ -30,12 +30,10 @@
         }
         return gradientColors;
     }
-    //# sourceMappingURL=color-utilities.js.map
 
     const POLL_CLOSE_TIME = Date.parse('2018-10-01T20:00:00.000-04:00');
     const TOTAL_NB_SEATS = 125;
     const REFRESH_INTERVAL = 5 * 1000;
-    //# sourceMappingURL=settings.js.map
 
     class Application {
         constructor() {
@@ -105,7 +103,7 @@
             const JSONP_ELEMENT_ID = 'jsonp-data';
             const NOW = Date.now();
             const url = NOW > POLL_CLOSE_TIME
-                ? `https://dgeq.org/resultats.js?_=${NOW}`
+                ? `https://dgeq.org/doc/gen1-10-2018/resultats.js?_=${NOW}`
                 : `https://dgeq.org/doc/gen7-4-2014/resultats.js?_=${NOW}`;
             return new Promise((resolve, reject) => {
                 let scriptElement = document.getElementById(JSONP_ELEMENT_ID);
@@ -398,7 +396,6 @@
     }
 
     const application = new Application();
-    //# sourceMappingURL=main.js.map
 
 }());
 //# sourceMappingURL=app.js.map
