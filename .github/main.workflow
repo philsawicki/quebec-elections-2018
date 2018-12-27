@@ -1,27 +1,27 @@
-workflow "Install, lint and deploy" {
+workflow "Build and lint" {
   on = "push"
-  resolves = ["Deploy"]
+  resolves = ["Build"]
 }
 
-action "Build" {
+action "Filter branch" {
+  uses = "actions/bin/filter@b2bea07"
+  args = "branch master"
+}
+
+action "Install" {
   uses = "actions/npm@e7aaefe"
   args = "install"
+  needs = ["Filter branch"]
 }
 
 action "Lint" {
   uses = "actions/npm@e7aaefe"
-  needs = ["Build"]
   args = "run lint"
+  needs = ["Install"]
 }
 
-action "Master" {
-  uses = "actions/bin/filter@b2bea07"
-  needs = ["Lint"]
-  args = "branch master"
-}
-
-action "Deploy" {
+action "Build" {
   uses = "actions/npm@e7aaefe"
-  needs = ["Master"]
-  args = "run deploy"
+  args = "run compile"
+  needs = ["Lint"]
 }
